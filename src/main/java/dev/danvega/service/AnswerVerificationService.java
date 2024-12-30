@@ -46,7 +46,7 @@ public class AnswerVerificationService {
     private String prepareVerificationPrompt(List<Map<String, Object>> userAnswers) {
         StringBuilder prompt = new StringBuilder("You are a professional exam checker.\n");
         prompt.append("The following is a list of questions, user answers, and possible choices. ");
-        prompt.append("Check the user's answers, return the correct answers, and mark if their answers are correct or incorrect. ");
+        prompt.append("Check the user's answers, return the correct answers only for incorrect answers, and mark if their answers are correct or incorrect. ");
         prompt.append("The response must be in JSON format strictly following this structure:\n\n");
         prompt.append("[\n");
         prompt.append("{ \"question\": \"Question text\", \"correctAnswers\": [\"Correct Choice\"], \"isCorrect\": true/false }, ...\n");
@@ -76,4 +76,5 @@ public class AnswerVerificationService {
         System.out.println("DEBUG: Sanitized response: " + response);
         return response.trim();
     }
+
 }

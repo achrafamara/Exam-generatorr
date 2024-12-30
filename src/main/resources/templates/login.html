@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <style>
+        /* Style global */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #007BFF, #6c757d);
+            color: #333;
+        }
+
+        /* Container principal */
+        .login-container {
+            background-color: #ffffff;
+            padding: 30px 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            width: 350px;
+            animation: slideIn 0.5s ease-in-out;
+        }
+
+        /* Animation d'apparition */
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Titre */
+        h2 {
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            color: #007BFF;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        /* Champs d'entrée */
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #007BFF;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+        }
+
+        /* Boutons */
+        button, .signup-btn {
+            width: 100%;
+            padding: 12px;
+            font-size: 1em;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background-color 0.3s ease, transform 0.2s;
+        }
+
+        button {
+            background-color: #007BFF;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+            transform: scale(1.02);
+        }
+
+        .signup-btn {
+            background-color: #28a745;
+            display: inline-block;
+            text-align: center;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .signup-btn:hover {
+            background-color: #218838;
+            transform: scale(1.02);
+        }
+
+        /* Messages d'erreur */
+        .error {
+            color: red;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+
+        /* Pied de page optionnel */
+        .footer {
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+<div class="login-container">
+    <h2>Login</h2>
+    <form th:action="@{/login}" method="post">
+        <input type="text" name="username" placeholder="Username" required>
+        <input type="password" name="password" placeholder="Password" required>
+        <button type="submit">Login</button>
+    </form>
+
+    <!-- Affichage des messages d'erreur -->
+    <div th:if="${param.error}" class="error">Invalid username or password</div>
+    <div th:if="${param.logout}" class="error">You have been logged out</div>
+
+    <!-- Bouton pour rediriger vers la page d'inscription -->
+    <a th:href="@{/signup}" class="signup-btn">Create an Account</a>
+
+    <!-- Pied de page facultatif -->
+    <div class="footer">
+        <p>&copy; 2024 Practice Exam Generator. All rights reserved.</p>
+    </div>
+</div>
+</body>
+</html>
