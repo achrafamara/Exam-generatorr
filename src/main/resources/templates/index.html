@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Practice Exam Generator</title>
     <style>
+        /* Style global */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
@@ -20,13 +21,14 @@
             color: #0056b3;
         }
 
+        /* Conteneur principal */
         .container {
             max-width: 800px;
-            margin: 0 auto;
+            margin: 40px auto;
             padding: 20px;
-            background: #fff;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
+            background: #ffffff;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
         }
 
         .intro {
@@ -35,167 +37,258 @@
             color: #555;
         }
 
-        .upload-section {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-bottom: 20px;
+        /* Barre de progression */
+        .progress-bar {
+            width: 100%;
+            background-color: #e0e0e0;
+            height: 12px;
+            border-radius: 6px;
+            margin: 20px 0;
+            overflow: hidden;
+            position: relative;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .progress {
+            height: 100%;
+            background: linear-gradient(to right, #007BFF, #0056b3);
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        .progress-percentage {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-weight: bold;
+            font-size: 0.9em;
+            color: #fff;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Style des questions et réponses */
+        .question-container {
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            background: #f9f9f9;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+
+        .question-container:hover {
+            background: #eef5ff;
+            transform: translateY(-2px);
+        }
+
+        .question-container p {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #0056b3;
+            margin-bottom: 10px;
         }
 
         label {
-            font-size: 1.1em;
-            margin-bottom: 10px;
-            font-weight: bold;
-        }
-
-        input[type="file"] {
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            width: 100%;
-            max-width: 300px;
-        }
-
-        button {
-            margin-top: 15px;
-            padding: 10px 20px;
+            display: block;
+            margin: 10px 0;
+            padding: 10px;
             font-size: 1em;
-            background-color: #007BFF;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
+            background: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            transition: background 0.3s ease, box-shadow 0.3s ease;
         }
 
+        label:hover {
+            background: #f0f8ff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        input[type="radio"] {
+            margin-right: 10px;
+        }
+
+        /* Boutons génériques */
+        button {
+            padding: 12px 20px;
+            font-size: 1em;
+            font-weight: bold;
+            color: #fff;
+            background: linear-gradient(90deg, #007BFF, #0056b3);
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        /* Effets des boutons au survol */
         button:hover {
-            background-color: #0056b3;
+            background: linear-gradient(90deg, #0056b3, #004494);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+            transform: translateY(-2px);
         }
 
+        button:disabled {
+            background: #ccc;
+            color: #666;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        button:active {
+            transform: translateY(1px);
+            box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Boutons spécifiques */
+        .back-button,
+        .logout-button {
+            background: linear-gradient(90deg, #FF6B6B, #FF3D3D); /* Rouge pour les actions importantes */
+            padding: 12px 25px;
+            width: auto;
+        }
+
+        .back-button:hover,
+        .logout-button:hover {
+            background: linear-gradient(90deg, #FF3D3D, #CC0000); /* Rouge plus foncé au survol */
+        }
+
+        .question-buttons button {
+            width: 160px; /* Taille uniforme pour les boutons en bas */
+        }
+
+        #submitAnswersButton {
+            background: linear-gradient(90deg, #28a745, #218838); /* Vert pour valider */
+        }
+
+        #submitAnswersButton:hover {
+            background: linear-gradient(90deg, #218838, #1e7e34);
+        }
+
+        #saveTestButton {
+            background: linear-gradient(90deg, #17a2b8, #138496); /* Bleu clair pour l'enregistrement */
+        }
+
+        #saveTestButton:hover {
+            background: linear-gradient(90deg, #138496, #117a8b);
+        }
+
+        /* Alignement des boutons */
+        .navigation-buttons,
+        .question-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px; /* Espacement entre les boutons */
+            margin-top: 20px;
+        }
+
+        /* Boutons de navigation (Précédent, Suivant) */
+        .navigation-buttons button {
+            font-size: 0.9em;
+            width: 120px; /* Taille réduite pour la navigation */
+        }
+
+        /* Spinner */
         .spinner {
             display: none;
-            margin: 20px auto;
-            border: 8px solid #f3f3f3;
-            border-top: 8px solid #007BFF;
+            width: 15px;
+            height: 15px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #007BFF;
             border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-        }
-
-        .submit-spinner {
-            display: none;
             margin-left: 10px;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #007BFF;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
             animation: spin 1s linear infinite;
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
-        .question {
-            margin-bottom: 15px;
-            padding: 15px;
-            background-color: #f9f9f9;
-            border-left: 5px solid #007BFF;
-            border-radius: 5px;
-        }
-
-        .choices {
-            margin-left: 15px;
-        }
-
-        .choices label {
-            display: block;
-            margin-bottom: 8px;
-            cursor: pointer;
-        }
-
-        .correct {
-            color: green;
-            font-weight: bold;
-        }
-
-        .incorrect {
-            color: red;
-            font-weight: bold;
-        }
-
-        .correct-answer {
-            color: green;
-            font-style: italic;
-            margin-left: 10px;
-        }
-
-        .footer {
-            text-align: center;
-            margin-top: 30px;
-            color: #777;
+        /* Contenu masqué */
+        .hidden {
+            display: none;
         }
     </style>
 </head>
 <body>
-<div style="text-align: right; margin-right: 20px;">
-    <button id="logoutButton" onclick="logout()" style="
-        background-color: #dc3545;
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        font-size: 1em;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: background-color 0.3s ease;">
-        Logout
-    </button>
-
+<div class="navigation-buttons">
+    <button class="back-button" onclick="goBack()">← Retour</button>
+    <button class="logout-button" onclick="logout()">Déconnexion</button>
 </div>
+
 <div class="container">
-<h1>Practice Exam Generator</h1>
-<div class="container">
-    <div class="intro">
-        <p>Welcome to the <strong>Practice Exam Generator</strong>. Upload your course PDF, and we'll generate a multiple-choice practice exam to help you test your knowledge and prepare effectively.</p>
+    <div class="progress-bar" id="progressBar">
+        <div class="progress" id="progress"></div>
+        <span class="progress-percentage" id="progressPercentage">0%</span>
     </div>
 
-    <form id="uploadForm" class="upload-section">
-        <label for="pdfFile">Upload a PDF:</label>
-        <input type="file" id="pdfFile" name="file" accept=".pdf" required>
-        <button type="submit">Generate Exam</button>
-        <div class="spinner" id="spinner"></div>
-    </form>
+    <div class="intro" id="introSection">
+        <h1>Practice Exam Generator</h1>
+        <p>Welcome to the <strong>Practice Exam Generator</strong>. Upload your course PDF, and we'll generate a multiple-choice practice exam to help you test your knowledge and prepare effectively.</p>
+        <form id="uploadForm">
+            <label for="pdfFile">Upload a PDF:</label>
+            <input type="file" id="pdfFile" name="file" accept=".pdf" required>
+            <button type="submit" id="generateExamButton">
+                Generate Exam
+                <div class="spinner" id="generateSpinner"></div>
+            </button>
+        </form>
+    </div>
 
-    <div id="questionsContainer"></div>
-    <p id="errorMessage" class="error"></p>
-</div>
+    <div id="questionsContainer" class="hidden"></div>
 
-<div class="footer">
-    <p>&copy; 2024 Practice Exam Generator. All rights reserved.</p>
+    <div class="question-buttons hidden" id="navigationButtons">
+        <button id="prevButton" onclick="prevQuestion()">Précédent</button>
+        <button id="nextButton" onclick="nextQuestion()">Suivant</button>
+    </div>
+
+    <button id="submitAnswersButton" class="hidden" onclick="submitAnswers()">
+        Submit Answers
+        <div class="spinner" id="submitSpinner"></div>
+    </button>
+    <button id="saveTestButton" class="hidden" onclick="saveTestResults()">Enregistrer le test</button>
 </div>
 
 <script>
     const form = document.getElementById('uploadForm');
-    const questionsContainer = document.getElementById('questionsContainer');
-    const errorMessage = document.getElementById('errorMessage');
-    const spinner = document.getElementById('spinner');
-    let questions = [];
+    const generateSpinner = document.getElementById('generateSpinner');
+    const submitSpinner = document.getElementById('submitSpinner');
+    const saveSpinner = document.createElement('div'); // Spinner pour le bouton "Enregistrer"
+    saveSpinner.className = 'spinner';
 
+    const questionsContainer = document.getElementById('questionsContainer');
+    const progress = document.getElementById('progress');
+    const progressPercentage = document.getElementById('progressPercentage');
+    const navigationButtons = document.getElementById('navigationButtons');
+    const submitAnswersButton = document.getElementById('submitAnswersButton');
+    const saveTestButton = document.getElementById('saveTestButton');
+    const prevButton = document.getElementById('prevButton');
+    const nextButton = document.getElementById('nextButton');
+
+    let questions = [];
+    let currentQuestionIndex = 0;
+    let fileName = '';
+    let finalScore = 0; // Déclaration globale pour le score final
+
+    /**
+     * Gestionnaire d'événement pour le téléchargement du fichier PDF
+     */
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        errorMessage.textContent = '';
-        questionsContainer.innerHTML = '';
-        spinner.style.display = 'block';
-
         const pdfFile = document.getElementById('pdfFile').files[0];
-        if (!pdfFile) {
-            errorMessage.textContent = "Please upload a PDF file.";
-            spinner.style.display = 'none';
-            return;
-        }
+        if (!pdfFile) return;
+
+        generateSpinner.style.display = 'inline-block';
 
         const formData = new FormData();
         formData.append('file', pdfFile);
@@ -206,64 +299,118 @@
                 body: formData,
             });
 
-            if (!response.ok) {
-                throw new Error("Failed to generate exam.");
-            }
+            if (!response.ok) throw new Error("Erreur lors de la génération de l'examen.");
 
             questions = await response.json();
-            renderQuestions(questions);
+            fileName = pdfFile.name.split('.')[0];
+            document.getElementById('introSection').classList.add('hidden');
+            questionsContainer.classList.remove('hidden');
+            renderQuestion();
+            updateProgressBar();
         } catch (error) {
-            errorMessage.textContent = error.message;
+            alert(error.message);
         } finally {
-            spinner.style.display = 'none';
+            generateSpinner.style.display = 'none';
         }
     });
 
-    function renderQuestions(questions) {
-        questions.forEach((q, index) => {
-            const questionDiv = document.createElement('div');
-            questionDiv.classList.add('question');
-            questionDiv.innerHTML = `<strong>${index + 1}. ${q.question}</strong>`;
+    /**
+     * Affiche une question à la fois
+     */
+    function renderQuestion() {
+        questionsContainer.innerHTML = '';
 
-            const choicesDiv = document.createElement('div');
-            choicesDiv.classList.add('choices');
-
-            q.choices.forEach(choice => {
-                const label = document.createElement('label');
-                label.innerHTML = `
-                <input type="checkbox" name="q${index}" value="${choice}">
+        const question = questions[currentQuestionIndex];
+        const questionDiv = document.createElement('div');
+        questionDiv.classList.add('question-container', 'active');
+        questionDiv.innerHTML = `
+        <p><strong>${currentQuestionIndex + 1}. ${question.question}</strong></p>
+        ${question.choices
+            .map(
+                (choice) => `
+            <label>
+                <input type="radio" name="q${currentQuestionIndex}" value="${choice}" ${
+                    question.selectedChoice === choice ? 'checked' : ''
+                }>
                 ${choice}
-            `;
-                choicesDiv.appendChild(label);
-            });
+            </label>
+        `
+            )
+            .join('')}
+    `;
 
-            questionDiv.appendChild(choicesDiv);
-            questionsContainer.appendChild(questionDiv);
-        });
-
-        const submitButton = document.createElement('button');
-        submitButton.textContent = 'Submit Answers';
-        submitButton.onclick = submitAnswers;
-        questionsContainer.appendChild(submitButton);
-
-        const submitSpinner = document.createElement('div');
-        submitSpinner.id = 'submitSpinner';
-        submitSpinner.classList.add('submit-spinner');
-        questionsContainer.appendChild(submitSpinner);
+        questionsContainer.appendChild(questionDiv);
+        updateNavigationButtons();
     }
 
+    /**
+     * Met à jour les boutons de navigation et affiche le bouton "Submit" à la fin
+     */
+    function updateNavigationButtons() {
+        navigationButtons.style.display = 'flex';
+        prevButton.disabled = currentQuestionIndex === 0;
+        nextButton.disabled = currentQuestionIndex === questions.length - 1;
+        submitAnswersButton.style.display = currentQuestionIndex === questions.length - 1 ? 'block' : 'none';
+        saveTestButton.style.display = currentQuestionIndex === questions.length - 1 ? 'block' : 'none';
+    }
+
+    /**
+     * Met à jour la barre de progression
+     */
+    function updateProgressBar() {
+        const progressValue = Math.round(((currentQuestionIndex + 1) / questions.length) * 100);
+        progress.style.width = `${progressValue}%`;
+        progressPercentage.textContent = `${progressValue}%`; // Met à jour le pourcentage affiché
+    }
+
+
+    /**
+     * Naviguer vers la question précédente
+     */
+    function prevQuestion() {
+        saveAnswer();
+        if (currentQuestionIndex > 0) {
+            currentQuestionIndex--;
+            renderQuestion();
+            updateProgressBar();
+        }
+    }
+
+    /**
+     * Naviguer vers la question suivante
+     */
+    function nextQuestion() {
+        saveAnswer();
+        if (currentQuestionIndex < questions.length - 1) {
+            currentQuestionIndex++;
+            renderQuestion();
+            updateProgressBar();
+        }
+    }
+
+    /**
+     * Sauvegarde de la réponse sélectionnée pour la question actuelle
+     */
+    function saveAnswer() {
+        const selectedChoice = document.querySelector(`input[name="q${currentQuestionIndex}"]:checked`);
+        questions[currentQuestionIndex].selectedChoice = selectedChoice ? selectedChoice.value : null;
+        console.log(
+            `Réponse pour la question ${currentQuestionIndex + 1}: ${
+                selectedChoice ? selectedChoice.value : 'Aucune sélectionnée'
+            }`
+        );
+    }
+
+    /**
+     * Envoie les réponses au serveur pour calculer le score
+     */
     async function submitAnswers() {
-        const submitSpinner = document.getElementById('submitSpinner');
         submitSpinner.style.display = 'inline-block';
 
-        const userAnswers = questions.map((q, index) => {
-            const selectedChoices = Array.from(document.querySelectorAll(`input[name="q${index}"]:checked`))
-                .map(input => input.value);
-            return {
-                question: q.question,
-                userChoices: selectedChoices,
-            };
-        });
+        const userAnswers = questions.map((q, i) => ({
+            question: q.question,
+            userChoices: q.selectedChoice ? [q.selectedChoice] : [],
+        }));
 
         try {
             const response = await fetch('/exam/verify-answers', {
@@ -272,82 +419,95 @@
                 body: JSON.stringify(userAnswers),
             });
 
-            if (!response.ok) {
-                throw new Error("Failed to verify answers.");
-            }
+            if (!response.ok) throw new Error("Erreur lors de la vérification des réponses.");
 
             const results = await response.json();
             displayResults(results);
         } catch (error) {
-            errorMessage.textContent = error.message;
+            console.error("Erreur dans submitAnswers :", error);
+            alert("Erreur lors de la soumission des réponses.");
         } finally {
             submitSpinner.style.display = 'none';
         }
     }
 
+    /**
+     * Affiche les résultats et met à jour le score global
+     */
     function displayResults(results) {
-        questionsContainer.innerHTML = ''; // Effacer le contenu précédent
-        let score = 0; // Initialisation du score
+        questionsContainer.innerHTML = '';
+        let correctAnswers = 0;
 
         results.forEach((result, index) => {
-            // Création d'une section pour chaque question
             const questionDiv = document.createElement('div');
             questionDiv.classList.add('question');
-            questionDiv.innerHTML = `<strong>${index + 1}. ${result.question}</strong>`;
+            questionDiv.innerHTML = `<p><strong>${index + 1}. ${result.question}</strong></p>`;
 
-            const choicesDiv = document.createElement('div');
-            choicesDiv.classList.add('choices');
-
-            if (result.isCorrect==true) {
-                // Si la réponse est correcte
-                score++;
-                const correctMessage = document.createElement('div');
-                correctMessage.classList.add('correct');
-                correctMessage.innerHTML = `
-                <span style="color: green; font-weight: bold;">✔ Correct!</span>
-            `;
-                questionDiv.appendChild(correctMessage);
+            if (result.isCorrect) {
+                correctAnswers++;
+                questionDiv.innerHTML += `<p style="color: green;">✔ Correct!</p>`;
             } else {
-                // Si la réponse est incorrecte
-                const incorrectMessage = document.createElement('div');
-                incorrectMessage.classList.add('incorrect');
-                incorrectMessage.innerHTML = `
-                <span style="color: red; font-weight: bold;">✖ Incorrect!</span>
-            `;
-                questionDiv.appendChild(incorrectMessage);
-
-                // Affichage de la bonne réponse avec le préfixe "Bonne réponse :"
-                const correctAnswerDiv = document.createElement('div');
-                correctAnswerDiv.classList.add('correct-answer');
-                correctAnswerDiv.innerHTML = `
-                <span style="color: green; font-style: italic;">
-                    ✔ Bonne réponse : ${result.correctAnswers.join(", ")}
-                </span>
-            `;
-                questionDiv.appendChild(correctAnswerDiv);
+                questionDiv.innerHTML += `<p style="color: red;">✖ Incorrect!</p>`;
+                questionDiv.innerHTML += `<p>Bonne réponse : ${result.correctAnswers.join(', ')}</p>`;
             }
 
-            // Ajouter la question dans le conteneur principal
-            questionDiv.appendChild(choicesDiv);
             questionsContainer.appendChild(questionDiv);
         });
 
-        // Affichage du score final
+        const totalQuestions = results.length;
+        finalScore = Math.round((correctAnswers / totalQuestions) * 100); // Met à jour la variable globale
+        console.log(`Score final : ${finalScore}% (${correctAnswers}/${totalQuestions} corrects)`);
+
         const scoreDiv = document.createElement('div');
-        scoreDiv.style.marginTop = "20px";
-        scoreDiv.innerHTML = `
-        <h3 style="color: #0056b3; text-align: center;">
-            Votre score : ${score} / ${results.length}
-        </h3>
-    `;
+        scoreDiv.innerHTML = `<h3>Votre Score : ${finalScore}%</h3>`;
+        scoreDiv.style.color = finalScore >= 50 ? 'green' : 'red';
         questionsContainer.appendChild(scoreDiv);
     }
+
+    /**
+     * Sauvegarde le test avec le score global
+     */
+    async function saveTestResults() {
+        saveSpinner.style.display = 'inline-block'; // Afficher le spinner pour "Enregistrer"
+        saveTestButton.appendChild(saveSpinner);
+
+        const testHistoryDTO = {
+            testName: fileName,
+            score: finalScore, // Utilise le score global
+            passed: finalScore >= 50,
+        };
+
+        console.log(`Enregistrement du test : ${JSON.stringify(testHistoryDTO)}`);
+
+        try {
+            const response = await fetch('/exam/save', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(testHistoryDTO),
+            });
+
+            if (!response.ok) throw new Error("Erreur lors de l'enregistrement du test.");
+
+            alert("Test enregistré avec succès !");
+        } catch (error) {
+            console.error("Erreur dans saveTestResults :", error);
+            alert("Erreur lors de l'enregistrement du test.");
+        } finally {
+            saveSpinner.style.display = 'none'; // Cacher le spinner
+        }
+    }
+
+    /**
+     * Navigation actions.
+     */
+    function goBack() {
+        window.location.href = '/';
+    }
+
     function logout() {
         window.location.href = '/logout';
     }
 
-
 </script>
-</div>
 </body>
 </html>

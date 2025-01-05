@@ -3,141 +3,107 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-    <style>
-        /* Style global */
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background: linear-gradient(135deg, #007BFF, #6c757d);
-            color: #333;
-        }
-
-        /* Container principal */
-        .login-container {
-            background-color: #ffffff;
-            padding: 30px 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            text-align: center;
-            width: 350px;
-            animation: slideIn 0.5s ease-in-out;
-        }
-
-        /* Animation d'apparition */
-        @keyframes slideIn {
-            from {
-                transform: translateY(-50px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        /* Titre */
-        h2 {
-            margin-bottom: 20px;
-            font-size: 1.8em;
-            color: #007BFF;
-            text-transform: uppercase;
-            font-weight: bold;
-        }
-
-        /* Champs d'entrée */
-        input {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 1em;
-            box-sizing: border-box;
-            transition: border-color 0.3s;
-        }
-
-        input:focus {
-            outline: none;
-            border-color: #007BFF;
-            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
-        }
-
-        /* Boutons */
-        button, .signup-btn {
-            width: 100%;
-            padding: 12px;
-            font-size: 1em;
-            border: none;
-            border-radius: 8px;
-            color: white;
-            cursor: pointer;
-            margin-top: 10px;
-            transition: background-color 0.3s ease, transform 0.2s;
-        }
-
-        button {
-            background-color: #007BFF;
-        }
-
-        button:hover {
-            background-color: #0056b3;
-            transform: scale(1.02);
-        }
-
-        .signup-btn {
-            background-color: #28a745;
-            display: inline-block;
-            text-align: center;
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-        .signup-btn:hover {
-            background-color: #218838;
-            transform: scale(1.02);
-        }
-
-        /* Messages d'erreur */
-        .error {
-            color: red;
-            font-size: 0.9em;
-            margin-top: 10px;
-        }
-
-        /* Pied de page optionnel */
-        .footer {
-            margin-top: 20px;
-            font-size: 0.9em;
-            color: #666;
-        }
-    </style>
+    <title>Login & Sign Up</title>
+    <link rel="stylesheet" href="/css/index.css">
+    <script src="https://kit.fontawesome.com/64d58efce2.js" crossorigin="anonymous"></script>
 </head>
 <body>
-<div class="login-container">
-    <h2>Login</h2>
-    <form th:action="@{/login}" method="post">
-        <input type="text" name="username" placeholder="Username" required>
-        <input type="password" name="password" placeholder="Password" required>
-        <button type="submit">Login</button>
-    </form>
+<div class="container">
+    <!-- Formulaires de connexion et d'inscription -->
+    <div class="forms-container">
+        <div class="signin-signup">
+            <!-- Formulaire de connexion -->
+            <form action="/login" method="post" class="sign-in-form">
+                <h2 class="title">Sign in</h2>
+                <div class="input-field">
+                    <i class="fas fa-user"></i>
+                    <input type="text" name="username" placeholder="Username" required />
+                </div>
+                <div class="input-field">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" name="password" placeholder="Password" required />
+                </div>
+                <input type="submit" value="Login" class="btn solid" />
+                <p class="social-text">Or Sign in with social platforms</p>
+                <div class="social-media">
+                    <a href="#" class="social-icon">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    <a href="#" class="social-icon">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="#" class="social-icon">
+                        <i class="fab fa-google"></i>
+                    </a>
+                    <a href="#" class="social-icon">
+                        <i class="fab fa-linkedin-in"></i>
+                    </a>
+                </div>
+                <!-- Messages d'erreur ou succès -->
+                <div class="error" th:if="${param.error}">
+                    Invalid username or password.
+                </div>
+                <div class="success" th:if="${param.signupSuccess}">
+                    Account created successfully! Please log in.
+                </div>
+            </form>
 
-    <!-- Affichage des messages d'erreur -->
-    <div th:if="${param.error}" class="error">Invalid username or password</div>
-    <div th:if="${param.logout}" class="error">You have been logged out</div>
+            <!-- Formulaire d'inscription -->
+            <form action="/signup" method="post" class="sign-up-form">
+                <h2 class="title">Sign up</h2>
+                <div class="input-field">
+                    <i class="fas fa-user"></i>
+                    <input type="text" name="username" placeholder="Username" required />
+                </div>
+                <div class="input-field">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" name="password" placeholder="Password" required />
+                </div>
+                <input type="submit" value="Sign up" class="btn" />
+                <p class="social-text">Or Sign up with social platforms</p>
+                <div class="social-media">
+                    <a href="#" class="social-icon">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    <a href="#" class="social-icon">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="#" class="social-icon">
+                        <i class="fab fa-google"></i>
+                    </a>
+                    <a href="#" class="social-icon">
+                        <i class="fab fa-linkedin-in"></i>
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
 
-    <!-- Bouton pour rediriger vers la page d'inscription -->
-    <a th:href="@{/signup}" class="signup-btn">Create an Account</a>
-
-    <!-- Pied de page facultatif -->
-    <div class="footer">
-        <p>&copy; 2024 Practice Exam Generator. All rights reserved.</p>
+    <!-- Panneaux pour basculer entre connexion et inscription -->
+    <div class="panels-container">
+        <div class="panel left-panel">
+            <div class="content">
+                <h3>New here?</h3>
+                <p>
+                    Sign up to start your journey with us.
+                </p>
+                <button class="btn transparent" id="sign-up-btn">Sign up</button>
+            </div>
+            <img src="/img/log.svg" class="image" alt="Sign up illustration" />
+        </div>
+        <div class="panel right-panel">
+            <div class="content">
+                <h3>One of us?</h3>
+                <p>
+                    Sign in to continue where you left off.
+                </p>
+                <button class="btn transparent" id="sign-in-btn">Sign in</button>
+            </div>
+            <img src="/img/register.svg" class="image" alt="Sign in illustration" />
+        </div>
     </div>
 </div>
+
+<script src="/js/index.js"></script>
 </body>
 </html>

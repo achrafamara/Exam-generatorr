@@ -20,28 +20,32 @@ public class AnswerVerificationService {
     }
 
     public List<Map<String, Object>> verifyUserAnswers(List<Map<String, Object>> userAnswers) {
-        // Préparation du prompt pour le LLM
-        String prompt = prepareVerificationPrompt(userAnswers);
-
-        // Envoi du prompt au LLM
-        System.out.println("Sending verification prompt to LLM...");
-        String response = chatClient.prompt()
-                .user(prompt)
-                .call()
-                .content();
-
-        System.out.println("Received verification response: " + response);
-
-        // Nettoyage et parsing de la réponse
-        String sanitizedResponse = sanitizeResponse(response);
-
         try {
-            // Conversion de la réponse nettoyée en JSON
+            System.out.println("=== Vérification des réponses utilisateur ===");
+            System.out.println("UserAnswers: " + userAnswers);
+
+            // Préparation du prompt
+            String prompt = prepareVerificationPrompt(userAnswers);
+            System.out.println("Prompt envoyé au LLM: " + prompt);
+
+            // Appel au LLM
+            String response = chatClient.prompt()
+                    .user(prompt)
+                    .call()
+                    .content();
+            System.out.println("Réponse brute du LLM: " + response);
+
+            // Nettoyage et parsing de la réponse
+            String sanitizedResponse = sanitizeResponse(response);
+            System.out.println("Réponse nettoyée: " + sanitizedResponse);
+
             return objectMapper.readValue(sanitizedResponse, new TypeReference<>() {});
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to parse verification response. " + e.getMessage());
+        } catch (Exception e) {
+            System.err.println("Erreur lors de la vérification des réponses: " + e.getMessage());
+            throw new RuntimeException("Échec de la vérification des réponses.");
         }
     }
+
 
     private String prepareVerificationPrompt(List<Map<String, Object>> userAnswers) {
         StringBuilder prompt = new StringBuilder("You are a professional exam checker.\n");
