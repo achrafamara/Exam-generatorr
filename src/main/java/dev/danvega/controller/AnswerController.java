@@ -3,6 +3,8 @@ package dev.danvega.controller;
 import dev.danvega.model.TestHistory;
 import dev.danvega.model.TestHistoryDTO;
 import dev.danvega.model.User;
+import dev.danvega.model.UserAnswer;
+import dev.danvega.repository.UserAnswerRepository;
 import dev.danvega.service.AnswerVerificationService;
 import dev.danvega.service.TestHistoryService;
 import dev.danvega.service.UserService;
@@ -13,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -24,12 +27,14 @@ public class AnswerController {
     private final UserService userService;
     private final TestHistoryService testHistoryService;
     private final ObjectMapper objectMapper;
-
+    private final UserAnswerRepository userAnswerRepository;
     public AnswerController(
             AnswerVerificationService verificationService,
             UserService userService,
             TestHistoryService testHistoryService,
+            UserAnswerRepository userAnswerRepository,
             ObjectMapper objectMapper) {
+        this.userAnswerRepository = userAnswerRepository;
         this.verificationService = verificationService;
         this.userService = userService;
         this.testHistoryService = testHistoryService;
@@ -79,6 +84,44 @@ public class AnswerController {
             return ResponseEntity.badRequest().body("Erreur lors du test.");
         }
     }
+
+    @PostMapping("/submit-complete-test")
+    public ResponseEntity<Object> submitCompleteTest(@RequestBody Map<String, Object> payload) {
+        try {
+            String testFileName = (String) payload.get("testFileName"); // Récupérer testFileName
+            List<Map<String, Object>> userAnswers = (List<Map<String, Object>>) payload.get("userAnswers"); // Récupérer les réponses
+
+            // Récupérer l'utilisateur actuel
+            User currentUser = userService.getCurrentUser();
+
+            // Calcul des scores (ajoutez votre logique ici)
+            int totalQuestions = userAnswers.size();
+            int correctAnswers = 0; // Remplir selon votre logique
+            int numericScore = (int) ((correctAnswers / (double) totalQuestions) * 100);
+            boolean passed = numericScore >= 50;
+
+            // Sauvegarde de l'historique du test
+            TestHistory testHistory = testHistoryService.saveTestHistory(currentUser, testFileName, numericScore, passed);
+
+            // Sauvegarde des réponses utilisateur
+            userAnswers.forEach(answer -> {
+                UserAnswer userAnswer = new UserAnswer();
+                userAnswer.setTestHistory(testHistory);
+                userAnswer.setQuestion((String) answer.get("question"));
+                userAnswer.setUserChoices((List<String>) answer.get("userChoices"));
+                userAnswerRepository.save(userAnswer);
+            });
+
+            return ResponseEntity.ok(Map.of(
+                    "message", "Test complet soumis avec succès.",
+                    "testHistoryId", testHistory.getId()
+            ));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("Erreur lors de la soumission du test complet.");
+        }
+    }
+
 
 
     /**
@@ -214,6 +257,42 @@ public class AnswerController {
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.badRequest().body(null);
+        }
+    }
+    @GetMapping("/test/{testId}/details")
+    public ResponseEntity<Object> getTestDetails(@PathVariable Long testId) {
+        try {
+            // Récupérer les réponses utilisateur liées à l'historique du test
+            List<UserAnswer> userAnswers = userAnswerRepository.findByTestHistoryId(testId);
+
+            // Transformer en format lisible pour le frontend
+            List<Map<String, Object>> details = userAnswers.stream().map(answer -> Map.of(
+                    "question", answer.getQuestion(),
+                    "userChoices", answer.getUserChoices()
+            )).toList();
+
+            return ResponseEntity.ok(details);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erreur lors de la récupération des détails du test.");
+        }
+    }
+    @GetMapping("/test/{testId}/questions-answers")
+    public ResponseEntity<Object> getQuestionsAndAnswers(@PathVariable Long testId) {
+        try {
+            // Récupérer toutes les réponses utilisateur liées à ce test
+            List<UserAnswer> userAnswers = userAnswerRepository.findByTestHistoryId(testId);
+
+            // Transformer en format lisible pour le frontend
+            List<Map<String, Object>> questionsAndAnswers = userAnswers.stream().map(answer -> Map.of(
+                    "question", answer.getQuestion(),
+                    "userChoices", answer.getUserChoices()
+            )).toList();
+
+            return ResponseEntity.ok(questionsAndAnswers);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erreur lors de la récupération des questions et réponses.");
         }
     }
 

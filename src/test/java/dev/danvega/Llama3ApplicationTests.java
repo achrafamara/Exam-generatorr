@@ -47,7 +47,7 @@ public class Llama3ApplicationTests {
 		User user = userService.getCurrentUser();
 
 		// Appeler la méthode de sauvegarde
-		testHistoryService.saveTestHistory(user, "Test 1", "85", true);
+		testHistoryService.saveTestHistory(user, "Test 1", 85, true);
 
 		// Vérifier que l'historique est enregistré
 		List<TestHistoryDTO> history = testHistoryService.getTestHistoryByUserId(user.getId());

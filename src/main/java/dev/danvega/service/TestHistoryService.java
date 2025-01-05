@@ -3,7 +3,9 @@ package dev.danvega.service;
 import dev.danvega.model.TestHistory;
 import dev.danvega.model.TestHistoryDTO;
 import dev.danvega.model.User;
+import dev.danvega.model.UserAnswer;
 import dev.danvega.repository.TestHistoryRepository;
+import dev.danvega.repository.UserAnswerRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -14,14 +16,16 @@ import java.util.stream.Collectors;
 @Service
 public class TestHistoryService {
 
-    private final TestHistoryRepository testHistoryRepository;
+    private final UserAnswerRepository userAnswerRepository; // Ajout de ce repository
 
-    public TestHistoryService(TestHistoryRepository testHistoryRepository) {
+    private final TestHistoryRepository testHistoryRepository;
+    public TestHistoryService(UserAnswerRepository userAnswerRepository, TestHistoryRepository testHistoryRepository) {
+        this.userAnswerRepository = userAnswerRepository;
         this.testHistoryRepository = testHistoryRepository;
     }
 
     @Transactional
-    public void saveTestHistory(User user, String testName, int score, boolean passed) {
+    public TestHistory saveTestHistory(User user, String testName, int score, boolean passed) {
         try {
             System.out.println("=== Sauvegarde des résultats ===");
             System.out.println("Utilisateur : " + user.getUsername());
@@ -29,6 +33,7 @@ public class TestHistoryService {
             System.out.println("Score : " + score);
             System.out.println("Passed : " + passed);
 
+            // Création de l'objet TestHistory
             TestHistory testHistory = new TestHistory();
             testHistory.setUser(user);
             testHistory.setTestName(testName);
@@ -36,12 +41,19 @@ public class TestHistoryService {
             testHistory.setPassed(passed);
             testHistory.setTestDate(LocalDate.now());
 
-            testHistoryRepository.save(testHistory);
+            // Enregistrement dans la base de données
+            TestHistory savedTestHistory = testHistoryRepository.save(testHistory); // Retourne l'objet sauvegardé
             System.out.println("=== Résultats sauvegardés avec succès ===");
+
+            return savedTestHistory; // Retourne l'objet enregistré
         } catch (Exception e) {
             System.err.println("Erreur lors de la sauvegarde : " + e.getMessage());
             throw e;
         }
+    }
+    @Transactional
+    public void saveUserAnswers(List<UserAnswer> userAnswers) {
+        userAnswerRepository.saveAll(userAnswers);
     }
 
     public List<TestHistoryDTO> getTestHistoryByUserId(Long userId) {

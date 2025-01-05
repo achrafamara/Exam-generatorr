@@ -218,6 +218,7 @@
         .hidden {
             display: none;
         }
+
     </style>
 </head>
 <body>
@@ -257,6 +258,8 @@
         <div class="spinner" id="submitSpinner"></div>
     </button>
     <button id="saveTestButton" class="hidden" onclick="saveTestResults()">Enregistrer le test</button>
+    <button id="saveCompleteTestButton" onclick=" submitCompleteTest()">Enregistrer Test Complet</button>
+
 </div>
 
 <script>
@@ -494,6 +497,56 @@
             alert("Erreur lors de l'enregistrement du test.");
         } finally {
             saveSpinner.style.display = 'none'; // Cacher le spinner
+        }
+    }
+    async function submitCompleteTest() {
+        const button = document.querySelector("#saveTestButton");
+        button.disabled = true; // Désactiver le bouton immédiatement après le clic
+
+        const userAnswers = questions.map((q) => ({
+            question: q.question,
+            userChoices: q.selectedChoice ? [q.selectedChoice] : [], // Réponses utilisateur
+        }));
+
+        const testFileName = fileName; // Assurez-vous que "fileName" est défini quelque part
+        const testHistoryDTO = {
+            testName: testFileName,
+            score: finalScore, // Utilisez la variable globale du score calculé
+            passed: finalScore >= 50, // Indique si le test est réussi ou non
+        };
+
+        try {
+            // Étape 1 : Enregistrer le test avec /exam/save
+            const saveResponse = await fetch('/exam/save', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(testHistoryDTO),
+            });
+
+            if (!saveResponse.ok) throw new Error("Erreur lors de l'enregistrement du test.");
+
+            console.log("Test enregistré avec succès !");
+
+            // Étape 2 : Soumettre le test complet avec /exam/submit-complete-test
+            const submitResponse = await fetch('/exam/submit-complete-test', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    testFileName: testFileName,
+                    userAnswers: userAnswers,
+                }),
+            });
+
+            if (!submitResponse.ok) throw new Error("Erreur lors de la soumission du test complet.");
+
+            const results = await submitResponse.json();
+            alert("Test complet soumis avec succès !");
+            console.log("Résultats de la soumission complète :", results);
+        } catch (error) {
+            console.error("Erreur dans submitCompleteTest :", error);
+            alert("Une erreur s'est produite lors de l'enregistrement ou de la soumission du test.");
+        } finally {
+            button.disabled = false; // Réactiver le bouton après l'appel
         }
     }
 
